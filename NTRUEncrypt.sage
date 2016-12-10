@@ -1,4 +1,4 @@
-# TODO: __randpoly
+from sage.misc.prandom import randint
 R.<x> = ZZ['x']
 
 class NTRUEncrypt(object):
@@ -6,20 +6,25 @@ class NTRUEncrypt(object):
 		self.N = N_in
 		self.q = q_in
 		self.p = 3
-		# self.g = self.__randpoly__(dg)
-		self.g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10) #replace once we finish randpoly
+		self.df = randint(1,ceil(self.N/2))
+		self.dg = randint(1,ceil(self.N/2))
+		self.dr = randint(1,ceil(self.N/2))
+		self.g = self.__randpoly(self.dg)
+		#self.g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10) #replace once we finish randpoly
 
 		invq,invp = false,false
 		while not invq and not invp:
-			# self.__f = self.__randpoly__(df)
-			self.__f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10) #replace once we finish randpoly
+			self.__f = self.__randpoly(self.df)
+			#self.__f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10) #replace once we finish randpoly
 			invq, self.fq = self.__polyinv2n(self.__f,self.q)
 			invp, self.__fp = self.__polyinv3(self.__f)
 
 		self.h = self.__modcoeffs(self.p*self.__cylic_conv(self.fq,self.g),self.q)
 
 	def __randpoly(self,d):
-		pass
+		randlist = [1] * d + [-1] * (d-1) + [0] * (self.N - 2 * d + 1)
+		shuffle(randlist)
+		return R(randlist)
 
 	def __modcoeffs(self,f,m):
 		c = f.list()
@@ -40,7 +45,7 @@ class NTRUEncrypt(object):
 		while(1):
 			while(f(0) == 0 and f != 0):
 				f = f.shift(-1)
-				c = c.shift(1)
+				c = c * x
 				k += 1
 			
 			if f == 1:
@@ -74,7 +79,7 @@ class NTRUEncrypt(object):
 		while(1):
 			while(f(0) == 0 and f != 0):
 				f = f.shift(-1)
-				c = c.shift(1)
+				c = c * x
 				k += 1
 
 			if f == 1:
@@ -114,8 +119,8 @@ class NTRUEncrypt(object):
 		return R(h)
 
 	def encrypt(self,m,h):
-		r = -1+x^2+x^3+x^4-x^5-x^7 #replace once we finish randpoly
-		# r = self.__randpoly__(dr)
+		#r = -1+x^2+x^3+x^4-x^5-x^7 #replace once we finish randpoly
+		r = self.__randpoly(self.dr)
 		return self.__modcoeffs(self.__cylic_conv(r,h) + m,self.q)
 
 	def public_key(self):
