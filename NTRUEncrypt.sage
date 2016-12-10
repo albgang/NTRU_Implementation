@@ -2,22 +2,45 @@ from sage.misc.prandom import randint
 R.<x> = ZZ['x']
 
 class NTRUEncrypt(object):
-	def __init__(self,N_in,q_in):
-		self.N = N_in
-		self.q = q_in
+	def __init__(self,sec_lvl):
 		self.p = 3
-		self.df = randint(1,ceil(self.N/2))
-		self.dg = randint(1,ceil(self.N/2))
-		self.dr = randint(1,ceil(self.N/2))
-		self.g = self.__randpoly(self.dg)
-		#self.g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10) #replace once we finish randpoly
+		if sec_lvl == 1: #weak
+			self.N = 11
+			self.q = 32
+			self.df = 4
+			self.dg = 3
+			self.dr = 3
+		elif sec_lvl == 2: #moderate
+			self.N = 167
+			self.q = 128
+			self.df = 61
+			self.dg = 20
+			self.dr = 18
+		elif sec_lvl == 3: #standard
+			self.N = 263
+			self.q = 128
+			self.df = 50
+			self.dg = 24
+			self.dr = 16
+		elif sec_lvl == 4: #strongest
+			self.N = 503
+			self.q = 256
+			self.df = 216
+			self.dg = 72
+			self.dr = 55
+		else:
+			print("Invalid Security Level. Valid Security Levels are 1 (weak), 2(moderate), 3(standard), and 4(strongest)")
+			exit(1)
 
 		invq,invp = false,false
 		while not invq and not invp:
 			self.__f = self.__randpoly(self.df)
-			#self.__f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10) #replace once we finish randpoly
+			#self.__f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10)
 			invq, self.fq = self.__polyinv2n(self.__f,self.q)
 			invp, self.__fp = self.__polyinv3(self.__f)
+		
+		#self.g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10)
+		self.g = self.__randpoly(self.dg)
 
 		self.h = self.__modcoeffs(self.p*self.__cylic_conv(self.fq,self.g),self.q)
 
@@ -119,19 +142,25 @@ class NTRUEncrypt(object):
 		return R(h)
 
 	def encrypt(self,m,h):
-		#r = -1+x^2+x^3+x^4-x^5-x^7 #replace once we finish randpoly
+		#r = -1+x^2+x^3+x^4-x^5-x^7
 		r = self.__randpoly(self.dr)
 		return self.__modcoeffs(self.__cylic_conv(r,h) + m,self.q)
 
 	def public_key(self):
 		return self.h
 
+	def check_f(self,potential_f):
+		return potential_f == self.f
+
+	def check_fp(self,potential_fp):
+		return potential_fp == self.fp
+
 	def decrypt(self,c):
 		a = self.__modcoeffs(self.__cylic_conv(self.__f,c),self.q)
 		b = self.__modcoeffs(a,self.p)
 		return self.__modcoeffs(self.__cylic_conv(self.__fp,b),self.p)
 
-testntru = NTRUEncrypt(11,32)
+testntru = NTRUEncrypt(1)
 h = testntru.public_key()
 m = -1 + x^3 - x^4 - x^8 + x^9 + x^(10)
 print("message: ",m)
