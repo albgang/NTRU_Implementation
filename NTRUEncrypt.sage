@@ -1,137 +1,138 @@
-#TODO:
-# __modcoeffs__ (should function the same as the one on github)
-# __cylic_conv__ (section 1.2 on page 3 of grenoble.pdf)
-# __randpoly__ (don't need to do till end cuz we're testing with deterministic polynomials first)
-
+# TODO: __randpoly
 R.<x> = ZZ['x']
 
 class NTRUEncrypt(object):
-    def __init__(self,N_in,q_in):
-        print("__init__")
-        self.N = N_in
-        self.q = q_in
-        self.p = 3
-        f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10)
-        g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10)
-        invq, self.fq = self.__polyinv2n__(f,self.q)
-        invp, self.fp = self.__polyinv3__(f)
-        self.h = self.__modcoeffs__(p * self.__cylic_conv__(self.fq,g),self.q)
-        print("fq: ")
-        print(self.fq)
-        print("fp: ")
-        print(self.fp)
-        print("h: ")
-        print(self.h)
-# todo: 
-    def __randpoly__(self,d):
-        print("__randpoly__")
-        
-        pass
+	def __init__(self,N_in,q_in):
+		self.N = N_in
+		self.q = q_in
+		self.p = 3
+		# self.g = self.__randpoly__(dg)
+		self.g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10) #replace once we finish randpoly
 
-    # todo: 
-    def __modcoeffs__(self,f,m):
-        print("__modcoeffs__")
-        c = f.list()
-        m2 = m/2
-        for i in range(len(c)):
-            c[i] = c[i]%m
-            if c[i] > m2:
-                c[i] -= m
-        return R(c)        
+		invq,invp = false,false
+		while not invq and not invp:
+			# self.__f = self.__randpoly__(df)
+			self.__f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10) #replace once we finish randpoly
+			invq, self.fq = self.__polyinv2n(self.__f,self.q)
+			invp, self.__fp = self.__polyinv3(self.__f)
 
-    def __polyinv3__(self,a):
-        print("__polyinv3__")
-        k=0
-        b=1
-        c=0
-        f = a
-        g = x^self.N - 1
+		self.h = self.__modcoeffs(self.p*self.__cylic_conv(self.fq,self.g),self.q)
 
-        while(1):
-            while(f.coefficients(sparse=False)[0] == 0 and not f.is_zero()):
-                f = f/x
-                c = c*x
-                k += 1
+	def __randpoly(self,d):
+		pass
 
-            if f == 1:
-                return (True, (x^(N-k) * b).mod(x^self.N - 1)) 
-            elif -f == 1:
-                return (True, (-1)*(x^(N-k) * b).mod(x^self.N - 1))
-            elif f.degree() == -1 or f == 0:
-                return (False,0)
-            if f.degree() < g.degree():
-                f,g = g,f
-                b,c = c,b
+	def __modcoeffs(self,f,m):
+		c = f.list()
+		m2 = m/2
+		for i in range(len(c)):
+			c[i] = c[i]%m
+			if c[i] > m2:
+				c[i] -= m
+		return R(c)        
 
-            if f.coefficients(sparse=False)[0] == g.coefficients(sparse=False)[0]:
-                f = self.__modcoeffs__(f - g,3)
-                b + self.__modcoeffs__(b - c,3)
-            else:
-                f = self.__modcoeffs__(f + g,3)
-                b = self.__modcoeffs__(b + c,3)
+	def __polyinv3(self,a):
+		k=0
+		b=1
+		c=0
+		f = a
+		g = x^self.N - 1
 
-    def __polyinv2__(self,a):
-        print("__polyinv2__")
-        k=0
-        b=1
-        c=0
-        f = a
-        g = x^self.N - 1
+		while(1):
+			while(f(0) == 0 and f != 0):
+				f = f.shift(-1)
+				c = c.shift(1)
+				k += 1
+			
+			if f == 1:
+				return (True, self.__modcoeffs(self.__cylic_conv(x^((-k)%self.N),b),3)) 
+			elif f == -1:
+				return (True, self.__modcoeffs(self.__cylic_conv(-x^((-k)%self.N),b),3))
+			elif f.degree() == -1 or f.is_zero():
+				return (False,0)
 
-        while(1):
-            while(f.coefficients(sparse=False)[0] == 0 and not f.is_zero()):
-                f = f/x
-                c = c*x
-                k += 1
+			if f.degree() < g.degree():
+				f,g = g,f
+				b,c = c,b
 
-            if f == 1:
-                return (True, (x^(N-k) * b).mod(x^self.N - 1))
-            elif f.degree() == -1 or f == 0:
-                return (False,0)
-            if f.degree() < g.degree():
-                f,g = g,f
-                b,c = c,b
+			if f(0) == g(0):
+				f = self.__modcoeffs(f-g,3)
+				b = b-c
+				c = self.__modcoeffs(c,3)
 
-            f = self.__modcoeffs__(f + g,2)
-            b + self.__modcoeffs__(b + c,2)
+			else:
+				f = self.__modcoeffs(f+g,3)
+				b = b+c
+				c = self.__modcoeffs(c,3)
+
+	def __polyinv2(self,a):
+		k=0
+		b=1
+		c=0
+		f = a
+		g = x^self.N - 1
+
+		while(1):
+			while(f(0) == 0 and f != 0):
+				f = f.shift(-1)
+				c = c.shift(1)
+				k += 1
+
+			if f == 1:
+				return (True, self.__modcoeffs(self.__cylic_conv(x^((-k)%self.N),b),2)) 
+			elif f.degree() == -1 or f == 0:
+				return (False,0)
+
+			if f.degree() < g.degree():
+				f,g = g,f
+				b,c = c,b
+
+			f = self.__modcoeffs(f + g,2)
+			b = b+c
+			c = self.__modcoeffs(c,2)
 
 
-    def __polyinv2n__(self,a,pow2):
-        print("__polyinv2n__")
-        inv2, b = self.__polyinv2__(a)
-        if (inv2):
-            cur2 = 2
-            while cur2<pow2:
-                cur2 = cur2^2
-                b = self.__modcoeffs__(b * (2 - a*b),cur2)
-            return (True, b)
-        else: 
-            return (False,0)
+	def __polyinv2n(self,a,pow2):
+		inv2, b = self.__polyinv2(a)
+		if (inv2):
+			curpow2 = 2
+			while curpow2<pow2:
+				curpow2 = curpow2^2
+				ab = self.__cylic_conv(a,b)
+				b = self.__cylic_conv(b,2-ab)
+				b = self.__modcoeffs(b,curpow2)
+			return (True, self.__modcoeffs(b,pow2))
+		else: 
+			return (False,0)
 
-    # todo:
-    def __cylic_conv__(self,f,g):
-        print("__cylic_conv__")
-        fg = (f*g).list()
-        lower_fg = fg[0:self.N]
-        upper_fg = fg[self.N:len(fg)]
-        h = lower_fg
-        for i in range(len(upper_fg)):
-            h[i] += upper_fg[i]
-        return R(h)      
-        
+	def __cylic_conv(self,f,g):
+		fg = (f*g).list()
+		lower_fg = fg[0:self.N]
+		upper_fg = fg[self.N:len(fg)]
+		h = lower_fg
+		for i in range(len(upper_fg)):
+			h[i] += upper_fg[i]
+		return R(h)
 
-    def encrypt(self,m):
-        print("encrypt")
-        r = -1+x^2+x^3+x^4-x^5-x^7
-        # r = self.__randpoly__(dr)
-        return self.__modcoeffs__(self.__cylic_conv__(r,self.h) + m,self.q)
+	def encrypt(self,m,h):
+		r = -1+x^2+x^3+x^4-x^5-x^7 #replace once we finish randpoly
+		# r = self.__randpoly__(dr)
+		return self.__modcoeffs(self.__cylic_conv(r,h) + m,self.q)
 
-    def public_key(self):
-        return self.h
+	def public_key(self):
+		return self.h
 
-    def decrypt(self,c):
-        print("decrypt")
-        a = self.__modcoeffs__(self.__cylic_conv__(self.f,c),self.q)
-        b = self.__modcoeffs__(a,self.p)
-        return self.__modcoeffs__(self.__cylic_conv__(self.fp,b),self.p)
-testntru = NTRUEncrypt(11,5)
+	def decrypt(self,c):
+		a = self.__modcoeffs(self.__cylic_conv(self.__f,c),self.q)
+		b = self.__modcoeffs(a,self.p)
+		return self.__modcoeffs(self.__cylic_conv(self.__fp,b),self.p)
+
+testntru = NTRUEncrypt(11,32)
+h = testntru.public_key()
+m = -1 + x^3 - x^4 - x^8 + x^9 + x^(10)
+print("message: ",m)
+c = testntru.encrypt(m,h)
+print("ciphertext: ", c)
+d = testntru.decrypt(c)
+print("decryption: ", d)
+# print("private key attempt:", testntru.__f,testntru.__fp) # we want this to give error [it does]
+# print("private functions attempt:",testntru.__cylic_conv(x,x)) # we want this to give error [it does]
