@@ -39,7 +39,7 @@ NTRUEncrypt.sage contains our groups implementation of NTRUEncrypt for EECS475 (
         return R(c) 
 **Usage**
 ==========================
-Run this with sage and the command:
+Run sage and type this command in the sage terminal:
 ```
   sage NTRUEncrypt.sage
 ```
