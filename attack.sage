@@ -1,1 +1,1 @@
-from NTRUEncrypt import *
+load("NTRUEncrypt.sage")
