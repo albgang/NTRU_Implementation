@@ -1,4 +1,3 @@
-from sage.misc.prandom import randint
 R.<x> = ZZ['x']
 
 class NTRUEncrypt(object):
@@ -141,10 +140,10 @@ class NTRUEncrypt(object):
 			h[i] += upper_fg[i]
 		return R(h)
 
-	def encrypt(self,m,h):
+	def encrypt(self,m):
 		#r = -1+x^2+x^3+x^4-x^5-x^7
 		r = self.__randpoly(self.dr)
-		return self.__modcoeffs(self.__cylic_conv(r,h) + m,self.q)
+		return self.__modcoeffs(self.__cylic_conv(r,self.h) + m,self.q)
 
 	def public_key(self):
 		return self.h
@@ -160,13 +159,5 @@ class NTRUEncrypt(object):
 		b = self.__modcoeffs(a,self.p)
 		return self.__modcoeffs(self.__cylic_conv(self.__fp,b),self.p)
 
-testntru = NTRUEncrypt(1)
-h = testntru.public_key()
-m = -1 + x^3 - x^4 - x^8 + x^9 + x^(10)
-print("message: ",m)
-c = testntru.encrypt(m,h)
-print("ciphertext: ", c)
-d = testntru.decrypt(c)
-print("decryption: ", d)
 # print("private key attempt:", testntru.__f,testntru.__fp) # we want this to give error [it does]
 # print("private functions attempt:",testntru.__cylic_conv(x,x)) # we want this to give error [it does]
