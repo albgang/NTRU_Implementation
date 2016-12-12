@@ -17,7 +17,7 @@ dg = testntru.dg
 dr = testntru.dr
 
 # construct LNT matrix
-alpha = 5# max(ceil(sqrt(2*dg)/sqrt(2*df-1)),1)
+alpha = max(ceil(sqrt(2*dg)/sqrt(2*df-1)),1)
 hvec = h.list()
 hmat = []
 for i in range(N):
