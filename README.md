@@ -12,16 +12,16 @@ Run sage and type this command in the sage terminal:
 **Example**
 ==========================
 
-	load("NTRUEncrypt.sage")
+load("NTRUEncrypt.sage")
 
-	testntru = NTRUEncrypt(1)
-	h = testntru.public_key()
-	m = -1 + x^3 - x^4 - x^8 + x^9 + x^(10)
-	print("message: ",m)
-	c = testntru.encrypt(m)
-	print("ciphertext: ", c)
-	d = testntru.decrypt(c)
-	print("decryption: ", d)
+testntru = NTRUEncrypt(1)
+h = testntru.public_key()
+m = -1 + x^3 - x^4 - x^8 + x^9 + x^(10)
+print("message: ",m)
+c = testntru.encrypt(m)
+print("ciphertext: ", c)
+d = testntru.decrypt(c)
+print("decryption: ", d)
 
 **Contributors**
 ==========================
