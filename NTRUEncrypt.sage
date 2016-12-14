@@ -33,6 +33,7 @@ class NTRUEncrypt(object):
 
 		invq,invp = false,false
 		while not invq and not invp:
+<<<<<<< HEAD
 			#self.__f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10)
 			self.__f = self.__randpoly(self.df,self.df-1)
 			invq, self.fq = self.__polyinv2n(self.__f,self.q)
@@ -40,14 +41,23 @@ class NTRUEncrypt(object):
 		
 		#self.g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10)
 		self.g = self.__randpoly(self.dg,self.dg)
+=======
+			self.__f = self.__randpoly(self.df,self.df-1) # testing example: self.__f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10)
+			invq, self.fq = self.__polyinv2n(self.__f,self.q)
+			invp, self.__fp = self.__polyinv3(self.__f)
+		
+		self.__g = self.__randpoly(self.dg,self.dg) # testing example: self.__g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10)
+>>>>>>> 2bfdc6f932546fd616061f1661202956c719d105
 
-		self.h = self.__modcoeffs(self.p*self.__cylic_conv(self.fq,self.g),self.q)
+		self.h = self.__modcoeffs(self.p*self.__cylic_conv(self.fq,self.__g),self.q)
 
+	# Returns a polynomial with num1s 1's, numneg1s -1's, and N-num1s-numneg1s 0's
 	def __randpoly(self,num1s,numneg1s):
 		randlist = [1] * num1s + [-1] * numneg1s + [0] * (self.N-num1s-numneg1s)
 		shuffle(randlist)
 		return R(randlist)
 
+	# Takes the modulus of each coefficent of f to be between [-m/2,m/2]
 	def __modcoeffs(self,f,m):
 		c = f.list()
 		m2 = m/2
@@ -57,6 +67,7 @@ class NTRUEncrypt(object):
 				c[i] -= m
 		return R(c)        
 
+	# (1/3) Based on https://assets.securityinnovation.com/static/downloads/NTRU/resources/NTRUTech014.pdf
 	def __polyinv3(self,a):
 		k=0
 		b=1
@@ -91,6 +102,7 @@ class NTRUEncrypt(object):
 				b = b+c
 				c = self.__modcoeffs(c,3)
 
+	# (2/3) Based on https://assets.securityinnovation.com/static/downloads/NTRU/resources/NTRUTech014.pdf			
 	def __polyinv2(self,a):
 		k=0
 		b=1
@@ -117,6 +129,10 @@ class NTRUEncrypt(object):
 			b = b+c
 			c = self.__modcoeffs(c,2)
 
+<<<<<<< HEAD
+=======
+	# (3/3) Based on https://assets.securityinnovation.com/static/downloads/NTRU/resources/NTRUTech014.pdf
+>>>>>>> 2bfdc6f932546fd616061f1661202956c719d105
 	def __polyinv2n(self,a,pow2):
 		inv2, b = self.__polyinv2(a)
 		if (inv2):
@@ -130,6 +146,7 @@ class NTRUEncrypt(object):
 		else: 
 			return (False,0)
 
+	# Returns the Cyclic Convlution of f and g
 	def __cylic_conv(self,f,g):
 		fg = (f*g).list()
 		lower_fg = fg[0:self.N]
@@ -139,6 +156,7 @@ class NTRUEncrypt(object):
 			h[i] += upper_fg[i]
 		return R(h)
 
+<<<<<<< HEAD
 	def public_key(self):
 		return self.h
 
@@ -147,6 +165,23 @@ class NTRUEncrypt(object):
 		#r = -1+x^2+x^3+x^4-x^5-x^7
 		r = self.__randpoly(self.dr,self.dr)
 		return self.__modcoeffs(self.__cylic_conv(r,self.h) + m,self.q)
+=======
+	def encrypt(self,m):
+		r = self.__randpoly(self.dr,self.dr) # testing example: r = -1+x^2+x^3+x^4-x^5-x^7
+		return self.__modcoeffs(self.__cylic_conv(r,self.h) + m,self.q)
+
+	def public_key(self):
+		return self.h
+
+	def check_f(self,potential_f):
+		return potential_f == self.__f
+
+	def check_fp(self,potential_fp):
+		return potential_fp == self.__fp
+
+	def check_g(self,potential_g):
+		return potential_g == self.__g
+>>>>>>> 2bfdc6f932546fd616061f1661202956c719d105
 
 	def decrypt(self,c):
 		a = self.__modcoeffs(self.__cylic_conv(self.__f,c),self.q)
