@@ -41,11 +41,13 @@ class NTRUEncrypt(object):
 
 		self.h = self.__modcoeffs(self.p*self.__cylic_conv(self.fq,self.__g),self.q)
 
+	# Returns a polynomial with num1s 1's, numneg1s -1's, and N-num1s-numneg1s 0's
 	def __randpoly(self,num1s,numneg1s):
 		randlist = [1] * num1s + [-1] * numneg1s + [0] * (self.N-num1s-numneg1s)
 		shuffle(randlist)
 		return R(randlist)
 
+	# Takes the modulus of each coefficent of f to be between [-m/2,m/2]
 	def __modcoeffs(self,f,m):
 		c = f.list()
 		m2 = m/2
@@ -55,6 +57,7 @@ class NTRUEncrypt(object):
 				c[i] -= m
 		return R(c)        
 
+	# (1/3) Based on https://assets.securityinnovation.com/static/downloads/NTRU/resources/NTRUTech014.pdf
 	def __polyinv3(self,a):
 		k=0
 		b=1
@@ -89,6 +92,7 @@ class NTRUEncrypt(object):
 				b = b+c
 				c = self.__modcoeffs(c,3)
 
+	# (2/3) Based on https://assets.securityinnovation.com/static/downloads/NTRU/resources/NTRUTech014.pdf			
 	def __polyinv2(self,a):
 		k=0
 		b=1
@@ -115,7 +119,7 @@ class NTRUEncrypt(object):
 			b = b+c
 			c = self.__modcoeffs(c,2)
 
-
+	# (3/3) Based on https://assets.securityinnovation.com/static/downloads/NTRU/resources/NTRUTech014.pdf
 	def __polyinv2n(self,a,pow2):
 		inv2, b = self.__polyinv2(a)
 		if (inv2):
@@ -129,6 +133,7 @@ class NTRUEncrypt(object):
 		else: 
 			return (False,0)
 
+	# Returns the Cyclic Convlution of f and g
 	def __cylic_conv(self,f,g):
 		fg = (f*g).list()
 		lower_fg = fg[0:self.N]
