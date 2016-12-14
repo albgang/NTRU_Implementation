@@ -33,13 +33,11 @@ class NTRUEncrypt(object):
 
 		invq,invp = false,false
 		while not invq and not invp:
-			# self.__f = self.__randpoly(self.df,self.df-1)
-			self.__f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10)
+			self.__f = self.__randpoly(self.df,self.df-1) # testing example: self.__f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10)
 			invq, self.fq = self.__polyinv2n(self.__f,self.q)
 			invp, self.__fp = self.__polyinv3(self.__f)
 		
-		self.__g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10)
-		# self.g = self.__randpoly(self.dg,self.dg)
+		self.__g = self.__randpoly(self.dg,self.dg) # testing example: self.__g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10)
 
 		self.h = self.__modcoeffs(self.p*self.__cylic_conv(self.fq,self.__g),self.q)
 
@@ -141,8 +139,7 @@ class NTRUEncrypt(object):
 		return R(h)
 
 	def encrypt(self,m):
-		r = -1+x^2+x^3+x^4-x^5-x^7
-		# r = self.__randpoly(self.dr,self.dr)
+		r = self.__randpoly(self.dr,self.dr) # testing example: r = -1+x^2+x^3+x^4-x^5-x^7
 		return self.__modcoeffs(self.__cylic_conv(r,self.h) + m,self.q)
 
 	def public_key(self):
