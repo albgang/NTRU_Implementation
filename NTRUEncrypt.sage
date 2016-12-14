@@ -3,12 +3,12 @@ R.<x> = ZZ['x']
 class NTRUEncrypt(object):
 	def __init__(self,sec_lvl):
 		self.p = 3
-		if sec_lvl == 1: #weak
-			self.N = 11
-			self.q = 32
-			self.df = 4
-			self.dg = 3
-			self.dr = 3
+		if sec_lvl == 1: #weak/break
+			self.N = 50 #11
+			self.q = 2^8 #2^5 #minimum to break w/ algoirthm
+			self.df = 15 #4
+			self.dg = 10 #3
+			self.dr = 10 #3
 		elif sec_lvl == 2: #moderate
 			self.N = 167
 			self.q = 128
@@ -33,13 +33,13 @@ class NTRUEncrypt(object):
 
 		invq,invp = false,false
 		while not invq and not invp:
-			# self.__f = self.__randpoly(self.df,self.df-1)
-			self.__f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10)
+			#self.__f = -1 + x + x^2 - x^4 + x^6 + x^9 - x^(10)
+			self.__f = self.__randpoly(self.df,self.df-1)
 			invq, self.fq = self.__polyinv2n(self.__f,self.q)
 			invp, self.__fp = self.__polyinv3(self.__f)
 		
-		self.g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10)
-		# self.g = self.__randpoly(self.dg,self.dg)
+		#self.g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10)
+		self.g = self.__randpoly(self.dg,self.dg)
 
 		self.h = self.__modcoeffs(self.p*self.__cylic_conv(self.fq,self.g),self.q)
 
@@ -117,7 +117,6 @@ class NTRUEncrypt(object):
 			b = b+c
 			c = self.__modcoeffs(c,2)
 
-
 	def __polyinv2n(self,a,pow2):
 		inv2, b = self.__polyinv2(a)
 		if (inv2):
@@ -140,27 +139,26 @@ class NTRUEncrypt(object):
 			h[i] += upper_fg[i]
 		return R(h)
 
-	def encrypt(self,m):
-		r = -1+x^2+x^3+x^4-x^5-x^7
-		# r = self.__randpoly(self.dr,self.dr)
-		return self.__modcoeffs(self.__cylic_conv(r,self.h) + m,self.q)
-
 	def public_key(self):
 		return self.h
 
-	def check_f(self,potential_f):
-		return potential_f == self.f
-
-	def check_fp(self,potential_fp):
-		return potential_fp == self.fp
-
-	def check_g(self,potential_g):
-		return potential_g == self.g
+	#note m must be "small"
+	def encrypt(self,m):
+		#r = -1+x^2+x^3+x^4-x^5-x^7
+		r = self.__randpoly(self.dr,self.dr)
+		return self.__modcoeffs(self.__cylic_conv(r,self.h) + m,self.q)
 
 	def decrypt(self,c):
 		a = self.__modcoeffs(self.__cylic_conv(self.__f,c),self.q)
 		b = self.__modcoeffs(a,self.p)
 		return self.__modcoeffs(self.__cylic_conv(self.__fp,b),self.p)
+
+	#HACK FOR TESTING
+	# def get_f(self):
+	# 	return self.__f
+
+	# def get_g(self):
+	# 	return self.g
 
 # print("private key attempt:", testntru.__f,testntru.__fp) # we want this to give error [it does]
 # print("private functions attempt:",testntru.__cylic_conv(x,x)) # we want this to give error [it does]
