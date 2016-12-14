@@ -3,12 +3,18 @@ R.<x> = ZZ['x']
 class NTRUEncrypt(object):
 	def __init__(self,sec_lvl):
 		self.p = 3
-		if sec_lvl == 1: #weak
+		if sec_lvl == 0: #weakest
 			self.N = 11
 			self.q = 32
 			self.df = 4
 			self.dg = 3
 			self.dr = 3
+		elif sec_lvl == 1: #weak
+			self.N = 50 #11
+			self.q = 2^8 #2^5 #minimum to break w/ algoirthm
+			self.df = 15 #4
+			self.dg = 10 #3
+			self.dr = 10 #3
 		elif sec_lvl == 2: #moderate
 			self.N = 167
 			self.q = 128
@@ -28,7 +34,7 @@ class NTRUEncrypt(object):
 			self.dg = 72
 			self.dr = 55
 		else:
-			print("Invalid Security Level. Valid Security Levels are 1 (weak), 2(moderate), 3(standard), and 4(strongest)")
+			print("Invalid Security Level. Valid Security Levels are 0 (weakest), 1 (weak), 2(moderate), 3(standard), and 4(strongest)")
 			exit(1)
 
 		invq,invp = false,false
