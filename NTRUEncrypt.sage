@@ -38,10 +38,10 @@ class NTRUEncrypt(object):
 			invq, self.fq = self.__polyinv2n(self.__f,self.q)
 			invp, self.__fp = self.__polyinv3(self.__f)
 		
-		self.g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10)
+		self.__g = -1 + x^2 + x^3 + x^5 -x^8 - x^(10)
 		# self.g = self.__randpoly(self.dg,self.dg)
 
-		self.h = self.__modcoeffs(self.p*self.__cylic_conv(self.fq,self.g),self.q)
+		self.h = self.__modcoeffs(self.p*self.__cylic_conv(self.fq,self.__g),self.q)
 
 	def __randpoly(self,num1s,numneg1s):
 		randlist = [1] * num1s + [-1] * numneg1s + [0] * (self.N-num1s-numneg1s)
@@ -149,13 +149,13 @@ class NTRUEncrypt(object):
 		return self.h
 
 	def check_f(self,potential_f):
-		return potential_f == self.f
+		return potential_f == self.__f
 
 	def check_fp(self,potential_fp):
-		return potential_fp == self.fp
+		return potential_fp == self.__fp
 
 	def check_g(self,potential_g):
-		return potential_g == self.g
+		return potential_g == self.__g
 
 	def decrypt(self,c):
 		a = self.__modcoeffs(self.__cylic_conv(self.__f,c),self.q)
