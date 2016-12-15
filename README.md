@@ -2,11 +2,17 @@
 ==========================
 NTRUEncrypt.sage contains our groups implementation of NTRUEncrypt for EECS475 (Introduction to Cryptography). We implemented NTRU in order to shed some light on a lattice based cryptosystem.
 
+Similarly in order to foster our understanding of the weaknesses of the NTRU algorithm we also implemented an attack.
+
 **Usage**
 ==========================
 Run sage and type this command in the sage terminal:
 ```
   load("NTRUEncrypt.sage")
+```
+In order to run the attack type this command into the sage terminal:
+```
+sage attack.sage
 ```
 
 **Example**
