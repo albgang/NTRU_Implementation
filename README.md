@@ -6,7 +6,7 @@ Similarly in order to foster our understanding of the weaknesses of the NTRU alg
 
 **Usage**
 ==========================
-In order to use our NTRUEncrypt class, add this line to the top of sage script:
+In order to use our NTRUEncrypt class, add this line to the top of your sage script:
 ```
 load("NTRUEncrypt.sage")
 ```
