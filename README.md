@@ -10,7 +10,7 @@ In order to use our NTRUEncrypt class, add this line to the top of your sage scr
 ```
 load("NTRUEncrypt.sage")
 ```
-In order to run the attack type this command into the sage terminal:
+In order to run the attack type this command into the terminal:
 ```
 sage attack.sage
 ```
