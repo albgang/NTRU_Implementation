@@ -6,9 +6,9 @@ Similarly in order to foster our understanding of the weaknesses of the NTRU alg
 
 **Usage**
 ==========================
-Run sage and type this command in the sage terminal:
+In order to use our NTRUEncrypt class, add this line to the top of sage script:
 ```
-  load("NTRUEncrypt.sage")
+load("NTRUEncrypt.sage")
 ```
 In order to run the attack type this command into the sage terminal:
 ```
